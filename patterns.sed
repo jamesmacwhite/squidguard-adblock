@@ -1,6 +1,7 @@
 #
 # SquidGuard Sed Patterns
 # Used to create SquidGuard compatible expressions list
+# Last tested: 16/06/2015
 #
 
 s/\r//g;
