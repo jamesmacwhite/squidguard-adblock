@@ -1,0 +1,8 @@
+#
+# Easylist download URL's
+# Used in the get-easylist.sh script
+# You can add more lists if you would like
+#
+
+https://easylist-downloads.adblockplus.org/easylist.txt
+https://easylist-downloads.adblockplus.org/easyprivacy.txt
