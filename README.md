@@ -14,11 +14,15 @@ While I try and test this script on multiple linux distributions, there may be i
 
 You can either clone or download the master/release .zip and extract it anywhere on the machine you are going to run SquidGuard. Start by running `chmod` on the shell script so you can execute it
 
-`chmod +x get-easylist.sh`
+```shell
+chmod +x get-easylist.sh
+```
 
 Then just run the script with:
 
-`./get-easylist.sh`
+```shell
+./get-easylist.sh
+```
 
 The lists will be automatically be downloaded and converted. The conversion will need a bit of processing power as they can be quite large.
 
@@ -55,13 +59,13 @@ redirect http://yourwebsite.com/blank.gif
 
 The Adblock list files themselves are updated quite regularly, you can also run this script through cron, you just need to pass an additional parameter to avoid the user confirmation prompt:
 
-```
+```shell
 ./get-easylist.sh bypass_check
 ```
 
 You can then schedule the job through cron, be sure to update the path of where you've actually stored the script:
 
-```
+```shell
 0 0 * * * /path/to/get_easylist.sh bypass_check >/dev/null 2>&1
 ```
 
