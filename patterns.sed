@@ -1,7 +1,7 @@
 #
-# SquidGuard Sed Patterns
-# Used to create SquidGuard compatible expressions list
-# Last tested: 16/06/2015
+# ADBLOCK SED PATTERNS FOR SQUIDGUARD
+# This is the pattern used to create the expressions lists
+# Last tested: 20/06/2015
 #
 
 s/\r//g;

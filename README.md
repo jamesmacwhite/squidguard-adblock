@@ -6,24 +6,13 @@ Many similar scripts exist, but some are quite old and use `sed` patterns that a
 
 ### Setup
 
-First you'll need to have Squid and SquidGuard installed. This should be easily achieved through your Linux distribution's package manager.
+The script is designed to automatically detect the required aspects of your Squid and SquidGuard configuration, paths, file locations etc. When you run the script it will output what it thinks is correct, with the ability to stop the script if anything is wrong.
 
-Depending on your setup you may need to change the following variables:
-
-```
-SQUID_USER="squid"
-SQUID_CONF_DIR="/etc/squid"
-```
-
-`SQUID_USER` is the user account that squid runs under. Often, this is `squid`, in other Linux distributions it could be `proxy` or something else. 
-
-Additionally this script assumes the default config path of is `/etc/squid`. You may need to change `SQUID_CONF_DIR`.
-
-Apart from these two variable, the script tries to detect all other config paths/files without user input or setting a value that's geared towards a specific distro, the script will output what it thinks is correct, you have the option of reviewing this before the script continues. If there are problems detecting file paths, report as an issue, describing your setup.
+While I try and test this script on multiple linux distributions, there may be issues with detection in some cases. If you experience any problems, please file an issue on GitHub and I'll look into it.
 
 ### Installation
 
-You can either clone or download the master/release .zip and extract it anywhere on the machine you are going to run SquidGuard. Start by running `chmod` on the shell script.
+You can either clone or download the master/release .zip and extract it anywhere on the machine you are going to run SquidGuard. Start by running `chmod` on the shell script so you can execute it
 
 `chmod +x get-easylist.sh`
 
@@ -62,6 +51,20 @@ You should also put in a redirect directive in your dest block, with a 1x1 trans
 redirect http://yourwebsite.com/blank.gif
 ```
 
+### Automatic updates of expressions lists via cron
+
+The Adblock list files themselves are updated quite regularly, you can also run this script through cron, you just need to pass an additional parameter to avoid the user confirmation prompt:
+
+```
+./get-easylist.sh bypass_check
+```
+
+You can then schedule the job through cron, be sure to update the path of where you've actually stored the script:
+
+```
+0 0 * * * /path/to/get_easylist.sh bypass_check >/dev/null 2>&1
+```
+
 ### Comparison to Adblock Plus Browser Addon
 
 There are advantages and disadvantages of running Adblock expression lists through Squid, I'll cover them here:
@@ -77,13 +80,6 @@ There are advantages and disadvantages of running Adblock expression lists throu
 
 * Cannot detect JavaScript based ads
 * Ad space can often be left behind, where as the browser addon generally is better at removing the entire space
-
-### Known Issues/Roadmap
-
-* Adding expression lists to SquidGuard is a manual process currently
-* Potential issues with auto-detecting directory/config paths
-
-I hope to make improvements to the script in the future
 
 ### Contributing
 
