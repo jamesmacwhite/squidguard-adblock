@@ -14,7 +14,12 @@
 SCRIPT_NAME=${0##*/}
 SCRIPT_VERSION="0.2"
 
-echo "Starting ${SCRIPT_NAME} Version: ${SCRIPT_VERSION}"
+echo "******************************************************"
+printf "%s\n" "${SCRIPT_NAME} (Version ${SCRIPT_VERSION})" \
+"https://github.com/jamesmacwhite/squidguard-adblock" \
+"Developed by James White"
+echo "******************************************************"
+echo ""
 
 if ! [ "$(id -u)" = 0 ]; then
    echo "Please run this script as root"
