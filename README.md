@@ -1,55 +1,94 @@
-# SquidGuard Adblock
+# squidGuard/ufdbGuard Adblock expression lists
 
-A simple shell script that converts Adblock Plus lists into expressions files compatible with SquidGuard.
+A shell script that converts Adblock Plus lists into expressions files compatible with squidGuard and ufdbGuard
 
-Many similar scripts exist, but some are quite old and use `sed` patterns that actually cause segmentation faults when SquidGuard attempts to parse them.
+Many similar scripts exist to convert such lists, but some are quite old and use `sed` patterns that actually cause problems.
 
 ### Setup
 
-The script is designed to automatically detect the required aspects of your Squid and SquidGuard configuration, paths, file locations etc. When you run the script it will output what it thinks is correct, with the ability to stop the script if anything is wrong.
+The script is designed to automatically detect the required aspects of your Squid, squidGuard or ufdbGuard configuration, paths, file locations etc. When you run the script it will output what it thinks is correct, with the ability to stop the script if anything is wrong.
 
-While I try and test this script on multiple linux distributions, there may be issues with detection in some cases. If you experience any problems, please file an issue on GitHub and I'll look into it.
+While I try and test this script on multiple Linux distributions, there may be issues with detection in some cases. If you experience any problems, please file an issue on GitHub and I'll look into it.
 
 ### Installation
 
-You can either clone or download the master/release .zip and extract it anywhere on the machine you are going to run SquidGuard. Start by running `chmod` on the shell script so you can execute it
+No formal installation is required, other than to get the source and place it on the machine you are running Squid on.
+
+#### Git
+
+```
+git clone https://github.com/jamesmacwhite/squidguard-adblock
+cd squidguard-adblock
+```
+
+#### Extract from zip
+
+```
+wget -qO- -O squidguard-adblock-master.zip https://github.com/jamesmacwhite/squidguard-adblock/archive/master.zip && \ 
+unzip squidguard-adblock-master.zip && \ 
+rm squidguard-adblock-master.zip
+cd squidguard-adblock-master
+```
+
+Once extracted grant executable permission on the shell script:
 
 ```shell
 chmod +x get-easylist.sh
 ```
 
-Then just run the script with:
+See usage section for instructions on how to use the script
 
-```shell
-./get-easylist.sh
-```
+### Usage
 
-The lists will be automatically be downloaded and converted. The conversion will need a bit of processing power as they can be quite large.
+The script requires a couple of user parameters based on what setup you are running
 
-### Adding the Adblock expression files to SquidGuard
+##### squidGuard
 
-After a successful conversion, you'll need to setup your `squidguard.conf`. You will need a new `dest` that is then attached to an `acl`
+`./get-easylist.sh squidGuard`
+
+##### ufdbGuard
+
+`/get-easylist.sh ufdbGuard`
+
+The lists will be automatically be downloaded, converted and written to the database folder of the respective URL filter. The conversion will need a bit of processing power as they can be quite large.
+
+### Adding the Adblock expression files to squidGuard
 
 ```
 dest adblock {
-        expressionlist adblock/easylist
-        expressionlist adblock/easyprivacy
+	expressionlist adblock/easylist
+	expressionlist adblock/easyprivacy
 }
 ```
-
-This example uses the two default lists provided, you will need to add additional references if you added more.
 
 ```
 acl {
-        default {
-                pass !adblock all
-        }
+	default {
+		pass !adblock all
+	}
 }
 ```
 
-#### Replacing ads with a blank image file
+### Adding the Adblock expression files to ufdbGuard
 
-You should also put in a redirect directive in your dest block, with a 1x1 transparent gif. This is for when ads that match the expression list are found and simply get replaced by this image. You can find a 1x1 blank.gif image on at the root of the repo. This needs to be hosted on a web server and referenced like so in the `dest` block:
+```
+category adblock {
+	expressionlist  adblock/easylist
+	expressionlist  adblock/easyprivacy
+}
+```
+
+```
+acl {
+	default {
+		pass !adblock any
+	}
+}
+```
+
+#### Replacing advertisements with a blank image file
+
+You should also put in a redirect directive in your dest/category block, with a 1x1 transparent gif. This is for when adverts that match any rule in the expression list are found and simply get replaced by this image. You can find a 1x1 blank.gif image within the source. This needs to be hosted on a web server and referenced like so in the `dest` or `category` block:
 
 ```
 redirect http://yourwebsite.com/blank.gif
@@ -59,15 +98,17 @@ redirect http://yourwebsite.com/blank.gif
 
 The Adblock list files themselves are updated quite regularly, you can also run this script through cron, you just need to pass an additional parameter to avoid the user confirmation prompt:
 
-```shell
-./get-easylist.sh bypass_check
+```
+./get-easylist.sh [squidGuard/ufdbGuard] autoconfirm
 ```
 
-You can then schedule the job through cron, be sure to update the path of where you've actually stored the script:
+You can then schedule the job through cron, be sure to update the path of where you've actually stored the script, an example cron could be:
 
-```shell
-0 0 * * * /path/to/get_easylist.sh bypass_check >/dev/null 2>&1
 ```
+0 0 * * * /path/to/get_easylist.sh squidGuard autoconfirm >/dev/null 2>&1
+```
+
+This would run the script everyday at midnight 12 AM (00:00 AM) for squidGuard
 
 ### Comparison to Adblock Plus Browser Addon
 
