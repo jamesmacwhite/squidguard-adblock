@@ -28,7 +28,7 @@ fi
 
 get_squid_build_flag() { 
 	# $1: Build flag used during compile
-	squid -v | tr " " "\n" | grep -- "$1" | tail -n1 | cut -f2 -d '=' | sed "s/'//g"
+	$SQUID_BIN -v | tr " " "\n" | grep -- "$1" | tail -n1 | cut -f2 -d '=' | sed "s/'//g"
 }
 
 get_squid_conf_value() { 
