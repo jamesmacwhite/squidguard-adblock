@@ -39,7 +39,7 @@ usage() {
 
 # If no parameters are specified, show help guide
 if [ $# -eq 0 ] ; then
-	usage;
+	usage
 	exit 0
 fi
 
@@ -138,7 +138,7 @@ case "$1" in
 		# if sysconfig file exists use this to pull values instead
 		if [ "${UFDBGUARD_SYSCONF}" -eq 1 ] ; then
 			FILTER_DB_DIR=$(get_ufdb_sysconf_value "BLACKLIST_DIR" "${UFDBGUARD_SYSCONF}")
-	s		UFDBGUARD_USER=$(get_ufdb_sysconf_value "RUNAS" "${UFDBGUARD_SYSCONF}")
+			UFDBGUARD_USER=$(get_ufdb_sysconf_value "RUNAS" "${UFDBGUARD_SYSCONF}")
 			SQUID_USER=${UFDBGUARD_USER}
 		fi
 		
