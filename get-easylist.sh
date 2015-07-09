@@ -1,4 +1,4 @@
-s#!/bin/bash
+##!/bin/bash
 ###############################################################################################
 ## get-easylist.sh
 ## Author: James White (james@jmwhite.co.uk)
@@ -191,14 +191,14 @@ if [ ! "$2" == "autoconfirm" ] ; then
 	read -r -p "Does everything look OK? [Y/N] " SQUID_CONF_OK
 	
 	case ${SQUID_CONF_OK} in
-    	[yY][eE][sS]|[yY]) 
-        	echo "Great, will continue executing script"
+    		[yY][eE][sS]|[yY]) 
+        		echo "Great, will continue executing script"
 		;;
 		
-    	*)
+    		*)
 			echo "Exiting..."
 			exit 1
-        ;;
+        	;;
 	esac
 	
 fi
