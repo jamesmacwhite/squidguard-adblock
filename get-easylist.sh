@@ -14,6 +14,7 @@
 SCRIPT_NAME=${0##*/}
 SCRIPT_VERSION="0.3 BETA"
 GITHUB_REPO="https://github.com/jamesmacwhite/squidguard-adblock"
+WORKING_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 if ! [ "$(id -u)" = 0 ] ; then
    echo "Please run this script as root"
@@ -204,8 +205,8 @@ if [ ! "$2" == "autoconfirm" ] ; then
 fi
 
 # Pattern and URL files
-SED_PATTERN_FILE="patterns.sed"
-URL_LIST_FILE="urls.txt"
+SED_PATTERN_FILE="${WORKING_DIR}/patterns.sed"
+URL_LIST_FILE="${WORKING_DIR}/urls.txt"
 
 if [ ! -e "${SED_PATTERN_FILE}" ] || [ ! -e "${URL_LIST_FILE}" ] ; then
 	echo "One or more helper files are missing"
