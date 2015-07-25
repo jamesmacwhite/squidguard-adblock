@@ -1,8 +1,13 @@
-#
-# ADBLOCK SED PATTERNS FOR SQUIDGUARD
-# This is the pattern used to create the expressions lists
-# Last tested: 20/06/2015
-#
+############################################################################
+## patterns.sed
+## Description: sed expression rules that are used in the conversion
+## Last Modified: 16/06/2015
+## 
+## Notes:
+## These rules have been adapted from older working examples with tweaks
+## Tests are run regularly to confirm the conversion process is accurate
+## Updates to this file may be required if upstream changes to lists occur
+##
 
 s/\r//g;
 /Adblock/d;

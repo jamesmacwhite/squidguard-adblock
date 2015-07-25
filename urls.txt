@@ -1,9 +1,12 @@
-#
-# ADBLOCK LISTS
-# Add each list URL on a new line
-# You can add additional lists if you'd like
-# https://adblockplus.org/subscriptions
-#
+#########################################################################
+## urls.txt
+## Description: URL's of Adblock lists to download for conversion
+##
+## Notes:
+## Each list URL should be entered on a new line
+## By default EasyList and EasyPrivacy are included
+## Additional list files: https://adblockplus.org/subscriptions
+##
 
 https://easylist-downloads.adblockplus.org/easylist.txt
 https://easylist-downloads.adblockplus.org/easyprivacy.txt
