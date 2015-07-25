@@ -61,6 +61,15 @@ report_issue() {
 	exit 1
 }
 
+# Pattern and URL files
+SED_PATTERN_FILE="${WORKING_DIR}/patterns.sed"
+URL_LIST_FILE="${WORKING_DIR}/urls.txt"
+
+if [ ! -e "${SED_PATTERN_FILE}" ] || [ ! -e "${URL_LIST_FILE}" ] ; then
+	echo "One or more helper files are missing"
+	exit 1
+fi
+
 # Try and catch all the variants used on different Linux distros 
 SQUID_BIN=$(command -v squid squid2 squid3)
 
@@ -202,15 +211,6 @@ if [ ! "$2" == "autoconfirm" ] ; then
         	;;
 	esac
 	
-fi
-
-# Pattern and URL files
-SED_PATTERN_FILE="${WORKING_DIR}/patterns.sed"
-URL_LIST_FILE="${WORKING_DIR}/urls.txt"
-
-if [ ! -e "${SED_PATTERN_FILE}" ] || [ ! -e "${URL_LIST_FILE}" ] ; then
-	echo "One or more helper files are missing"
-	exit 1
 fi
 
 # Removes the header and modifies the format for use with this script
