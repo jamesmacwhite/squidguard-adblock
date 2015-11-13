@@ -1,9 +1,9 @@
-##!/bin/bash
+#!/usr/bin/env bash
 ###############################################################################################
 ## get-easylist.sh
 ## Author: James White (james@jmwhite.co.uk)
 ## Description: Gets Adblock lists and converts them to squidGuard/ufdbGuard expression lists
-## Version: 0.3 BETA
+## Version: 0.3 BETA 2
 ##
 ## Notes:
 ## A specific sed pattern file is required for the conversion
@@ -12,9 +12,10 @@
 ##
 
 SCRIPT_NAME=${0##*/}
-SCRIPT_VERSION="0.3 BETA"
+SCRIPT_VERSION="0.3 BETA 2"
 GITHUB_REPO="https://github.com/jamesmacwhite/squidguard-adblock"
-WORKING_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+WORKING_DIR=$(dirname "$0")
+OS=$(uname)
 
 if ! [ "$(id -u)" = 0 ] ; then
    echo "Please run this script as root"
@@ -70,8 +71,12 @@ if [ ! -e "${SED_PATTERN_FILE}" ] || [ ! -e "${URL_LIST_FILE}" ] ; then
 	exit 1
 fi
 
-# Try and catch all the variants used on different Linux distros 
-SQUID_BIN=$(command -v squid squid2 squid3)
+# Find the path to squid binary on target system
+if [ "${OS}" = "FreeBSD" ] ; then
+	SQUID_BIN=$(type squid | awk '{ print $3 }')
+else
+	SQUID_BIN=$(command -v squid squid2 squid3)
+fi
 
 if [ -z "${SQUID_BIN}" ] ; then
 	report_issue "Squid was not detected in PATH"
@@ -80,13 +85,14 @@ fi
 
 get_squid_build_flag() { 
 	# $1: Squid build flag value
-	${SQUID_BIN} -v | tr " " "\n" | grep -- "$1" | tail -n1 | cut -f2 -d '=' | tr -d "'"
+	${SQUID_BIN} -v | tr "'" "\n" | grep -- "$1" | tail -n1 | cut -f2 -d '='
 }
 
 get_squid_conf_value() { 
 	# $1: Squid config value
 	# $2: Squid config filename
-	grep -i "$1" "$2" | awk '{ print $2 }'
+	grep -i "$1" "$2" | cut -f2 -d ':' | awk '{ print $1 }'
+
 }
 
 UFDBGUARD_SYSCONF_FILE="/etc/sysconfig/ufdbguard"
@@ -113,7 +119,7 @@ show_message "Scanning your setup please wait..."
 # Squid configuration values, we can mostly use ./configure parameters
 SQUID_USER=$(get_squid_build_flag "--with-default-user")
 SQUID_CONF_DIR=$(get_squid_build_flag "--sysconfdir")
-SQUID_CONF_FILE=$(find "${SQUID_CONF_DIR}" -iname squid.conf)
+SQUID_CONF_FILE="${SQUID_CONF_DIR}/squid.conf"
 SQUID_LOG_FILE=$(get_squid_conf_value "access_log" "${SQUID_CONF_FILE}")
 
 # If any of these are blank, better stop what were doing, because the script will fail
@@ -130,8 +136,12 @@ case "$1" in
 	[sS][qQ][uU][iI][dD][gG][uU][aA][rR][dD])
 	
 		FILTER_TYPE="squidGuard"
-		SQUIDGUARD_BIN=$(command -v squidguard squidGuard)
-		FILTER_CONF_FILE=$(find "${SQUID_CONF_DIR}" -iname ${FILTER_TYPE}.conf)
+		if [ "${OS}" = "FreeBSD" ] ; then
+			SQUIDGUARD_BIN=$(type squidGuard | awk '{ print $3 }')
+		else
+			SQUIDGUARD_BIN=$(command -v squidguard squidGuard)
+		fi
+		FILTER_CONF_FILE="${SQUID_CONF_DIR}/${FILTER_TYPE}.conf"
 		FILTER_DB_DIR=$(get_squid_conf_value "dbhome" "${FILTER_CONF_FILE}")
 		FILTER_LOG_DIR=$(get_squid_conf_value "logdir" "${FILTER_CONF_FILE}")
 		
@@ -140,8 +150,12 @@ case "$1" in
 	[uU][fF][dD][bB][gG][uU][aA][rR][dD])
 		
 		FILTER_TYPE="ufdbGuard"
-		UFDBGUARD_BIN=$(command -v ufdbgclient)
-		FILTER_CONF_FILE=$(find / -iname ${FILTER_TYPE}.conf)
+		if [ "${OS}" = "FreeBSD" ] ; then
+			UFDBGUARD_BIN=$(type ufdbgclient | awk '{ print $3 }')
+		else
+			UFDBGUARD_BIN=$(command -v ufdbgclient)
+		fi
+		FILTER_CONF_FILE=$(find / -iname ${FILTER_TYPE}.conf 2>&1 | grep -v "Permission denied")
 		FILTER_DB_DIR=$(get_ufdb_conf_value "dbhome" "${FILTER_CONF_FILE}")
 		FILTER_LOG_DIR=$(get_ufdb_conf_value "logdir" "${FILTER_CONF_FILE}")
 		
@@ -201,14 +215,15 @@ if [ ! "$2" == "autoconfirm" ] ; then
 	read -r -p "Does everything look OK? [Y/N] " SQUID_CONF_OK
 	
 	case ${SQUID_CONF_OK} in
-    		[yY][eE][sS]|[yY]) 
-        		echo "Great, will continue executing script"
+	
+		[yY][eE][sS]|[yY]) 
+			echo "Great, will continue executing script"
 		;;
 		
-    		*)
+		*)
 			echo "Exiting..."
 			exit 1
-        	;;
+		;;
 	esac
 	
 fi
@@ -257,10 +272,14 @@ if [ "${FILTER_TYPE}" == "squidGuard" ] ; then
 fi
 
 if [ "${FILTER_TYPE}" == "ufdbGuard" ] ; then
-	/etc/init.d/ufdb restart
+	if [ "${UFDBGUARD_SYSCONF}" -eq 1 ] ; then
+		systemctl restart ufdb
+	else
+		/etc/init.d/ufdb restart
+	fi
 fi
 
-# Make sure permissions are good, to prevent problems with lauching any processes
+# Make sure permissions are good, to prevent problems with launching any processes
 chmod 644 "${FILTER_CONF_FILE}"
 chmod -R 640 "${FILTER_DB_DIR}"
 chmod -R 640 "${FILTER_LOG_DIR}"
