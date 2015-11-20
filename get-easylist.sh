@@ -91,7 +91,7 @@ get_squid_build_flag() {
 get_squid_conf_value() { 
 	# $1: Squid config value
 	# $2: Squid config filename
-	grep -i "$1" "$2" | cut -f2 -d ':' | awk '{ print $1 }'
+	grep -i "$1" "$2" | awk '{ print $2 }' | cut -f2 -d ':'
 
 }
 
