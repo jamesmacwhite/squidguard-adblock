@@ -7,6 +7,7 @@ Many similar scripts exist to convert such lists, but some are quite old and use
 ### Dependencies
 
 * bash
+* sed
 * wget
 * squid
 * squidGuard or ufdbGuard
